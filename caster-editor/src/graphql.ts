@@ -212,7 +212,7 @@ export type InvalidAudioFile = {
   error: Scalars['String'];
 };
 
-/** Mutations for GenCaster via GraphQL. */
+/** Mutations for Gencaster via GraphQL. */
 export type Mutation = {
   addAudioFile: AudioFileUploadResponse;
   /**
@@ -245,62 +245,62 @@ export type Mutation = {
 };
 
 
-/** Mutations for GenCaster via GraphQL. */
+/** Mutations for Gencaster via GraphQL. */
 export type MutationAddAudioFileArgs = {
   newAudioFile: AddAudioFile;
 };
 
 
-/** Mutations for GenCaster via GraphQL. */
+/** Mutations for Gencaster via GraphQL. */
 export type MutationAddEdgeArgs = {
   newEdge: EdgeInput;
 };
 
 
-/** Mutations for GenCaster via GraphQL. */
+/** Mutations for Gencaster via GraphQL. */
 export type MutationAddGraphArgs = {
   graphInput: AddGraphInput;
 };
 
 
-/** Mutations for GenCaster via GraphQL. */
+/** Mutations for Gencaster via GraphQL. */
 export type MutationAddNodeArgs = {
   newNode: NodeCreate;
 };
 
 
-/** Mutations for GenCaster via GraphQL. */
+/** Mutations for Gencaster via GraphQL. */
 export type MutationCreateUpdateScriptCellsArgs = {
   nodeUuid: Scalars['UUID'];
   scriptCellInputs: Array<ScriptCellInput>;
 };
 
 
-/** Mutations for GenCaster via GraphQL. */
+/** Mutations for Gencaster via GraphQL. */
 export type MutationCreateUpdateStreamVariableArgs = {
   streamVariables: Array<StreamVariableInput>;
 };
 
 
-/** Mutations for GenCaster via GraphQL. */
+/** Mutations for Gencaster via GraphQL. */
 export type MutationDeleteEdgeArgs = {
   edgeUuid: Scalars['UUID'];
 };
 
 
-/** Mutations for GenCaster via GraphQL. */
+/** Mutations for Gencaster via GraphQL. */
 export type MutationDeleteNodeArgs = {
   nodeUuid: Scalars['UUID'];
 };
 
 
-/** Mutations for GenCaster via GraphQL. */
+/** Mutations for Gencaster via GraphQL. */
 export type MutationDeleteScriptCellArgs = {
   scriptCellUuid: Scalars['UUID'];
 };
 
 
-/** Mutations for GenCaster via GraphQL. */
+/** Mutations for Gencaster via GraphQL. */
 export type MutationUpdateNodeArgs = {
   nodeUpdate: NodeUpdate;
 };
@@ -354,7 +354,7 @@ export enum PlaybackChoices {
   SyncPlayback = 'SYNC_PLAYBACK'
 }
 
-/** Queries for GenCaster. */
+/** Queries for Gencaster. */
 export type Query = {
   audioFile: AudioFile;
   audioFiles: Array<AudioFile>;
@@ -369,51 +369,51 @@ export type Query = {
 };
 
 
-/** Queries for GenCaster. */
+/** Queries for Gencaster. */
 export type QueryAudioFileArgs = {
   pagination?: InputMaybe<OffsetPaginationInput>;
   pk: Scalars['ID'];
 };
 
 
-/** Queries for GenCaster. */
+/** Queries for Gencaster. */
 export type QueryAudioFilesArgs = {
   filters?: InputMaybe<AudioFileFilter>;
   pagination?: InputMaybe<OffsetPaginationInput>;
 };
 
 
-/** Queries for GenCaster. */
+/** Queries for Gencaster. */
 export type QueryGraphArgs = {
   pk: Scalars['ID'];
 };
 
 
-/** Queries for GenCaster. */
+/** Queries for Gencaster. */
 export type QueryGraphsArgs = {
   filters?: InputMaybe<GraphFilter>;
 };
 
 
-/** Queries for GenCaster. */
+/** Queries for Gencaster. */
 export type QueryNodeArgs = {
   pk: Scalars['ID'];
 };
 
 
-/** Queries for GenCaster. */
+/** Queries for Gencaster. */
 export type QueryStreamPointArgs = {
   pk: Scalars['ID'];
 };
 
 
-/** Queries for GenCaster. */
+/** Queries for Gencaster. */
 export type QueryStreamPointsArgs = {
   filters?: InputMaybe<StreamPointFilter>;
 };
 
 
-/** Queries for GenCaster. */
+/** Queries for Gencaster. */
 export type QueryStreamVariableArgs = {
   pk: Scalars['ID'];
 };
@@ -472,9 +472,10 @@ export type StrFilterLookup = {
  * It also allows us to trace past streams.
  */
 export type Stream = {
-  active: Scalars['Boolean'];
   createdDate: Scalars['DateTime'];
   modifiedDate: Scalars['DateTime'];
+  /** Used as a garbage collection. If multiple users share the same stream we need to know when we can release the stream which happens if listener counter is 0. It starts with a default of 0 because this allows us to count stateless. */
+  numListeners: Scalars['Int'];
   streamPoint: StreamPoint;
   uuid: Scalars['UUID'];
 };
@@ -717,7 +718,7 @@ export type StreamSubscriptionVariables = Exact<{
 }>;
 
 
-export type StreamSubscription = { streamInfo: { __typename: 'NoStreamAvailable', error: string } | { __typename: 'StreamInfo', stream: { active: boolean, createdDate: any, modifiedDate: any, uuid: any, streamPoint: { uuid: any, port: number, useInput: boolean, modifiedDate: any, lastLive?: any | null, host: string, createdDate: any, janusInPort?: number | null, janusInRoom?: number | null, janusOutPort?: number | null, janusOutRoom?: number | null } }, streamInstruction?: { createdDate: any, instructionText: string, modifiedDate: any, state: string, uuid: any, returnValue: string } | null } };
+export type StreamSubscription = { streamInfo: { __typename: 'NoStreamAvailable', error: string } | { __typename: 'StreamInfo', stream: { numListeners: number, createdDate: any, modifiedDate: any, uuid: any, streamPoint: { uuid: any, port: number, useInput: boolean, modifiedDate: any, lastLive?: any | null, host: string, createdDate: any, janusInPort?: number | null, janusInRoom?: number | null, janusOutPort?: number | null, janusOutRoom?: number | null } }, streamInstruction?: { createdDate: any, instructionText: string, modifiedDate: any, state: string, uuid: any, returnValue: string } | null } };
 
 export type StreamPointsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -931,7 +932,7 @@ export const StreamDocument = gql`
     ... on StreamInfo {
       __typename
       stream {
-        active
+        numListeners
         createdDate
         modifiedDate
         streamPoint {
